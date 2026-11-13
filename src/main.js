@@ -30,17 +30,13 @@ $$('a[href^="#"]').forEach((a) =>
 /* ───────────── Contact data ───────────── */
 const waLink = (msg) => `https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(msg)}`;
 $('#waFloat').href = waLink('Hola, me interesa información de Viza Park.');
-$('#cTel').href = `tel:+52${CONTACTO.telefono.replace(/\s/g, '')}`;
-$('#cTel').textContent = CONTACTO.telefono;
-$('#cIg').href = CONTACTO.instagram;
 $('#cFb').href = CONTACTO.facebook;
-$('#addr').textContent = CONTACTO.direccion;
-$('#footAddr').textContent = CONTACTO.direccion;
 $('#mapsLink').href = CONTACTO.maps;
 $('#year').textContent = new Date().getFullYear();
 
 /* ───────────── Image sequence ───────────── */
-const FRAMES = 151;
+const FRAMES = 153;
+const SEQ_SECONDS = 9;
 const frames = [];
 const canvas = $('#seqCanvas');
 const ctx = canvas.getContext('2d');
@@ -53,7 +49,9 @@ function sizeCanvas() {
   drawFrame(seqState.frame);
 }
 function drawFrame(i) {
-  const img = frames[Math.round(i)];
+  // si el cuadro aún no carga, usa el más cercano ya disponible
+  let k = Math.round(i), img = frames[k];
+  while (k > 0 && !(img && img.complete && img.naturalWidth)) img = frames[--k];
   if (!img || !img.complete || !img.naturalWidth) return;
   const cw = canvas.width, ch = canvas.height;
   const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
@@ -61,30 +59,35 @@ function drawFrame(i) {
   ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
 }
 
-/* ───────────── Loader ───────────── */
+/* ───────────── Loader ─────────────
+   Solo espera la portada y los primeros cuadros (rápido para SEO / Core Web Vitals);
+   el resto de la secuencia se descarga en segundo plano. */
+const CRITICAL = 24;
 function preload() {
   return new Promise((resolve) => {
     let loaded = 0;
-    const total = FRAMES + 1;
+    const total = CRITICAL + 1;
     const bar = $('#loaderBar'), pct = $('#loaderPct');
     const tick = () => {
       loaded++;
-      const p = Math.round((loaded / total) * 100);
+      const p = Math.min(100, Math.round((loaded / total) * 100));
       bar.style.width = p + '%';
       pct.textContent = p;
-      if (loaded === 1 || loaded % 10 === 0) drawFrame(seqState.frame);
-      if (loaded >= total) resolve();
+      if (loaded === total) resolve();
     };
     const hero = new Image();
     hero.onload = hero.onerror = tick;
-    hero.src = '/assets/img/acceso.webp';
+    hero.src = '/assets/img/hero-portada.webp';
     for (let i = 0; i < FRAMES; i++) {
       const img = new Image();
-      img.onload = img.onerror = tick;
-      img.src = `/assets/seq/f${String(i + 1).padStart(3, '0')}.webp`;
+      if (i < CRITICAL) img.onload = img.onerror = () => { tick(); if (i === 0) drawFrame(seqState.frame); };
       frames.push(img);
     }
-    setTimeout(resolve, 7000); // nunca bloquear más de 7 s
+    // primero los cuadros críticos, luego el resto
+    frames.forEach((img, i) => { if (i < CRITICAL) img.src = `/assets/seq/f${String(i + 1).padStart(3, '0')}.webp`; });
+    const rest = () => frames.forEach((img, i) => { if (i >= CRITICAL) img.src = `/assets/seq/f${String(i + 1).padStart(3, '0')}.webp`; });
+    addEventListener('load', () => setTimeout(rest, 200), { once: true });
+    setTimeout(resolve, 3500); // nunca bloquear más de 3.5 s
   });
 }
 
@@ -105,8 +108,9 @@ Promise.all([preload(), document.fonts?.ready]).then(() => {
       .set('#loader', { display: 'none' })
       .from('.hero__img', { scale: 1.45, duration: 2.2, ease: 'expo.out' }, '-=.7')
       .to('.hero__title .line > span', { y: 0, duration: 1.2, stagger: 0.1, ease: 'expo.out' }, '<.1')
-      .from(['.hero__eyebrow', '.hero__sub', '.hero__ctas', '.hero__badge', '.hero__scroll', '.nav'], {
-        y: 24, autoAlpha: 0, duration: 1, stagger: 0.08, ease: 'power3.out',
+      .from(['.hero__logo', '.hero__rule'], { y: 24, autoAlpha: 0, duration: 1, stagger: 0.1, ease: 'power3.out' }, '<')
+      .from(['.hero__sub', '.hero__ctas', '.hero__place', '.hero__scroll'], {
+        y: 24, autoAlpha: 0, duration: 1, stagger: 0.08, ease: 'power3.out', clearProps: 'transform',
       }, '<.4');
   }
   ScrollTrigger.refresh();
@@ -116,14 +120,10 @@ addEventListener('resize', () => sizeCanvas());
 
 /* ───────────── Nav ───────────── */
 const nav = $('#nav');
-let lastY = 0;
 ScrollTrigger.create({
   start: 0, end: 'max',
   onUpdate(self) {
-    const y = self.scroll();
-    nav.classList.toggle('is-scrolled', y > 40);
-    nav.classList.toggle('is-hidden', y > lastY && y > 400 && !$('#mobileMenu').classList.contains('is-open'));
-    lastY = y;
+    nav.classList.toggle('is-scrolled', self.scroll() > 40);
     $('#navProgress').style.transform = `scaleX(${self.progress})`;
   },
 });
@@ -146,8 +146,7 @@ burger.addEventListener('click', () => {
 if (reduced) gsap.set('.hero__title .line > span', { y: 0 });
 gsap.timeline({ scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } })
   .to('.hero__img', { scale: 1.35, yPercent: 8, ease: 'none' }, 0)
-  .to('.hero__content', { yPercent: -30, autoAlpha: 0, ease: 'none' }, 0)
-  .to('.hero__badge', { y: -120, ease: 'none' }, 0);
+  .to('.hero__content', { yPercent: -18, autoAlpha: 0, ease: 'none' }, 0);
 
 /* ───────────── Sequence scroll ───────────── */
 const caps = $$('.seq__cap');
@@ -160,7 +159,7 @@ ScrollTrigger.create({
     seqState.frame = p * (FRAMES - 1);
     drawFrame(seqState.frame);
     $('#seqTrack').style.transform = `scaleX(${p})`;
-    const secs = p * 8.4;
+    const secs = p * SEQ_SECONDS;
     $('#seqTime').textContent = `00:${String(Math.floor(secs)).padStart(2, '0')}:${String(Math.floor((secs % 1) * 24)).padStart(2, '0')}`;
     let idx = -1;
     capAt.forEach((at, i) => { if (p >= at) idx = i; });
@@ -235,9 +234,17 @@ gsap.timeline({ scrollTrigger: { trigger: '#integral', start: 'top 70%' } })
   .to('.integral__img img', { scale: 1, duration: 2, ease: 'expo.out' }, '-=1');
 
 /* ───────────── Ubicación ───────────── */
-gsap.to('.ubi__rings i', {
-  scale: 1, duration: 1.6, stagger: 0.2, ease: 'expo.out',
-  scrollTrigger: { trigger: '.ubi__map', start: 'top 70%' },
+$$('.ubi .tab').forEach((t) => t.addEventListener('click', () => {
+  $$('.ubi .tab').forEach((x) => { x.classList.toggle('is-active', x === t); x.setAttribute('aria-selected', String(x === t)); });
+  $$('.ubi__img').forEach((img) => img.classList.toggle('is-on', img.dataset.map === t.dataset.map));
+}));
+gsap.from('.ubi__map', {
+  clipPath: 'inset(12% 12% 12% 12% round 24px)', duration: 1.6, ease: 'expo.out',
+  scrollTrigger: { trigger: '.ubi__map', start: 'top 75%' },
+});
+gsap.from('.places li', {
+  y: 16, autoAlpha: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out',
+  scrollTrigger: { trigger: '.places', start: 'top 85%' },
 });
 
 /* ───────────── Sectores (órbita) ───────────── */
@@ -312,12 +319,6 @@ lblAcc.textContent = 'Acceso';
   el('circle', { cx: x, cy: y, r: 11, fill: '#f26b1d' }, g).style.fill = '#f26b1d';
   const tx = el('text', { x, y: y + 4.5 }, g); tx.textContent = t; tx.style.fill = '#fff';
 });
-// marcadores de módulos
-[[1, 474, 128], [2, 668, 64], [3, 433, 300], [4, 625, 300], [5, 446, 572], [6, 393, 845]].forEach(([m, x, y]) => {
-  const g = el('g', { class: 'mp-mark mp-mod', 'data-mod': m }, gLabels);
-  el('circle', { cx: x, cy: y, r: 11 }, g);
-  const t = el('text', { x, y: y + 4.5 }, g); t.textContent = m;
-});
 // contorno animado
 const outline = el('polygon', { points: ptsStr(SITE), class: 'mp-outline' }, gLabels);
 
@@ -360,7 +361,7 @@ gsap.timeline({ scrollTrigger: { trigger: '.mp__map', start: 'top 70%' } })
   .from('#mpBase > *', { autoAlpha: 0, duration: 0.8, stagger: 0.005 }, 0.3)
   .from('.nv', {
     autoAlpha: 0, scale: 0.4, transformOrigin: '50% 50%', duration: 0.6, ease: 'back.out(1.8)',
-    stagger: { each: 0.018, from: 'start' },
+    stagger: { each: 0.018, from: 'start' }, clearProps: 'opacity,visibility,transform',
   }, 0.6)
   .from('.mp-mark', { scale: 0, transformOrigin: '50% 50%', svgOrigin: undefined, duration: 0.5, stagger: 0.05, ease: 'back.out(2)' }, '-=.4');
 
@@ -393,7 +394,7 @@ function selectNave(n, { scroll = false } = {}) {
   badge.classList.toggle('is-apart', !isDisp);
   $('#mdNum').textContent = String(n).padStart(2, '0');
   $('#mdM2').textContent = nv.m2.toFixed(2);
-  $('#mdMod').textContent = `Módulo ${nv.modulo} · ${MODULOS[nv.modulo]}`;
+  $('#mdPm2').textContent = isDisp ? fmt(PRECIO_M2) : '—';
   const p = priceOf(nv);
   $('#mdPrice').textContent = isDisp ? fmt(p) : '—';
   $('#mdEng').textContent = isDisp ? fmt(p * ESQUEMA.enganche) : '—';
@@ -418,28 +419,34 @@ naveEls.forEach((g, n) => {
 });
 $('#mdCotizar').addEventListener('click', () => scrollTo('#cotizador'));
 
-// Filtros
-let fEstado = 'all', fMod = 0;
+// Filtros: estatus + superficie
+let fEstado = 'all', fSize = 'all';
 function applyFilters() {
+  let count = 0;
   NAVES.forEach((nv) => {
-    const ok = (fEstado === 'all' || nv.estado === fEstado) && (!fMod || nv.modulo === fMod);
-    naveEls.get(nv.n).classList.toggle('is-dim', !ok);
+    const okE = fEstado === 'all' || nv.estado === fEstado;
+    const okS = fSize === 'all' || (fSize === 'std' ? nv.m2 <= 260 : nv.m2 > 260);
+    const ok = okE && okS;
+    const g = naveEls.get(nv.n);
+    g.classList.toggle('is-dim', !ok);
+    g.classList.remove('is-match');
+    if (ok) { count++; if (fEstado !== 'all' || fSize !== 'all') { void g.getBBox(); g.classList.add('is-match'); } }
   });
-  $$('.mp__mods li').forEach((li) => li.classList.toggle('is-active', +li.dataset.mod === fMod));
+  $('#mpResult').innerHTML = `Mostrando <b>${count}</b> de 64 naves`;
 }
-$$('.mp__filters .chip').forEach((c) => c.addEventListener('click', () => {
-  $$('.mp__filters .chip').forEach((x) => x.classList.remove('is-active'));
-  c.classList.add('is-active'); fEstado = c.dataset.filter; applyFilters();
+$$('.mp__filters .chip[data-filter]').forEach((c) => c.addEventListener('click', () => {
+  $$('.mp__filters .chip[data-filter]').forEach((x) => x.classList.toggle('is-active', x === c));
+  fEstado = c.dataset.filter; applyFilters();
 }));
-$('#mpModulo').addEventListener('change', (e) => { fMod = +e.target.value; applyFilters(); });
-$$('.mp__mods li').forEach((li) => li.addEventListener('click', () => {
-  fMod = fMod === +li.dataset.mod ? 0 : +li.dataset.mod;
-  $('#mpModulo').value = fMod; applyFilters();
+$$('.mp__filters .chip[data-size]').forEach((c) => c.addEventListener('click', () => {
+  $$('.mp__filters .chip[data-size]').forEach((x) => x.classList.toggle('is-active', x === c));
+  fSize = c.dataset.size; applyFilters();
 }));
+applyFilters();
 
 /* ═══════════════════ COTIZADOR ═══════════════════ */
 const selNave = $('#cotNave');
-const opts = disp.map((nv) => `<option value="${nv.n}">Nave ${String(nv.n).padStart(2, '0')} · ${nv.m2.toFixed(2)} m² · Módulo ${nv.modulo}</option>`).join('');
+const opts = disp.map((nv) => `<option value="${nv.n}">Nave ${String(nv.n).padStart(2, '0')} · ${nv.m2.toFixed(2)} m²</option>`).join('');
 selNave.innerHTML = opts;
 $('#contactNave').innerHTML = `<option value="">Aún no lo sé</option>${opts}`;
 const firstStd = disp.find((n) => n.m2 === 260) || disp[0];
@@ -486,13 +493,89 @@ function calc() {
   tweenText('#cotMensual', contado ? 0 : saldo / meses);
   tweenText('#cotRenta', (base * ESQUEMA.retornoRenta) / 12);
   renderChart(base);
-  lastCalc = { nv, precio, enganche, saldo, contado, iva: iva > 1 };
+  const plan = amortizacion(enganche, saldo, contado ? 0 : meses);
+  renderAmort(plan, contado);
+  lastCalc = { nv, base, precio, enganche, saldo, contado, iva: iva > 1, meses, plan };
   $('#cotWa').href = waLink(
     `Hola, coticé en el sitio de Viza Park:\n• Nave ${nv.n} (${nv.m2.toFixed(2)} m²)\n• Precio: ${fmt(precio)}${iva > 1 ? ' IVA incl.' : ' + IVA'}\n• Enganche: ${fmt(enganche)}\n` +
     (contado ? '• Pago de contado\n' : `• ${meses} mensualidades de ${fmt(saldo / meses)}\n`) + 'Me gustaría recibir más información.'
   );
 }
-$('#cotPrint').addEventListener('click', () => print());
+/* Tabla de amortización (meses sin intereses) */
+const fecha = (d) => d.toLocaleDateString('es-MX', { month: 'short', year: 'numeric' }).replace('.', '');
+function amortizacion(enganche, saldo, n) {
+  const hoy = new Date();
+  const rows = [{ k: 0, fecha: 'A la firma', concepto: 'Enganche', monto: enganche, resta: saldo }];
+  if (!n) return rows;
+  const pago = Math.floor((saldo / n) * 100) / 100;
+  let resta = saldo;
+  for (let k = 1; k <= n; k++) {
+    const monto = k === n ? Math.round(resta * 100) / 100 : pago;
+    resta = Math.max(0, resta - monto);
+    const d = new Date(hoy.getFullYear(), hoy.getMonth() + k, 1);
+    rows.push({ k, fecha: fecha(d), concepto: `Mensualidad ${k} de ${n}`, monto, resta });
+  }
+  return rows;
+}
+const money = (v) => v.toLocaleString('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 2 });
+function renderAmort(rows, contado) {
+  $('#amortBody').innerHTML = rows.map((r) =>
+    `<tr><td>${r.k}</td><td>${r.fecha}</td><td>${r.concepto}</td><td>${money(r.monto)}</td><td>${money(r.resta)}</td></tr>`).join('');
+  $('#amortTotal').textContent = money(rows.reduce((s, r) => s + r.monto, 0));
+  $('#amortSum').textContent = contado ? 'Pago único de contado' : `${rows.length - 1} mensualidades sin intereses`;
+}
+
+/* PDF de la cotización: documento limpio en un iframe oculto (1–2 páginas) */
+function cotizacionHTML(c) {
+  const hoy = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
+  const folio = `VP-${c.nv.n}-${Date.now().toString().slice(-6)}`;
+  const vals = [1, 2, 3].map((i) => c.base * (1 + ESQUEMA.plusvaliaAnual) ** i);
+  const row = (a, b, hl) => `<tr${hl ? ' class="hl"' : ''}><th>${a}</th><td>${b}</td></tr>`;
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Cotización Viza Park · Nave ${c.nv.n}</title>
+<style>
+@page{size:letter;margin:14mm}
+*{box-sizing:border-box}body{font:12px/1.45 Inter,Arial,sans-serif;color:#0a1530;margin:0}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #f26b1d;padding-bottom:12px;margin-bottom:18px}
+header img{height:54px}header div{text-align:right;color:#55607a;font-size:11px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#2c5fa8;margin:18px 0 8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+table{width:100%;border-collapse:collapse}th,td{padding:6px 8px;border-bottom:1px solid #e3e6ee;text-align:left}td{text-align:right;font-variant-numeric:tabular-nums}
+.sum th{font-weight:500;color:#55607a}.hl th,.hl td{font-weight:700;color:#c4541a}
+.am thead th{background:#0a1530;color:#fff;font-size:10px;text-transform:uppercase;letter-spacing:.06em}.am td,.am th{font-size:11px;padding:4px 8px}
+.am td:nth-child(-n+3),.am th:nth-child(-n+3){text-align:left}.am tr{page-break-inside:avoid}.am tfoot th,.am tfoot td{font-weight:700;border-top:2px solid #0a1530}
+.box{background:#f4f1ea;border-radius:8px;padding:12px 14px}.big{font-size:26px;font-weight:800;margin:2px 0}
+footer{margin-top:18px;padding-top:10px;border-top:1px solid #e3e6ee;font-size:10px;color:#6b7590}
+</style></head><body>
+<header><img src="${location.origin}/assets/brand/logo-alt.png" alt="Viza Park"><div><b>Cotización ${folio}</b><br>${hoy}<br>Tel. ${CONTACTO.telefono}</div></header>
+<h1>Nave ${String(c.nv.n).padStart(2, '0')} · ${c.nv.m2.toFixed(2)} m²</h1>
+<div>Parque industrial Viza Park · ${CONTACTO.direccion}</div>
+<div class="grid">
+ <div><h2>Resumen</h2><div class="box"><div>Precio de lista ${c.iva ? '(IVA incluido)' : '(antes de IVA)'}</div><div class="big">${money(c.precio)}</div><div>${c.nv.m2.toFixed(2)} m² × ${money(PRECIO_M2)} por m²</div></div>
+  <table class="sum">${row('Enganche', money(c.enganche))}${row('Saldo', money(c.saldo))}${c.contado ? row('Forma de pago', 'Contado') : row(`${c.meses} mensualidades sin intereses de`, money(c.saldo / c.meses), true)}${row('Renta mensual estimada (10 % anual)', money((c.base * ESQUEMA.retornoRenta) / 12))}</table></div>
+ <div><h2>Proyección del activo</h2><table class="sum">${row('Valor hoy', money(c.base))}${vals.map((v, i) => row(`Año ${i + 1}`, money(v))).join('')}</table>
+  <p style="color:#6b7590;font-size:10px">Plusvalía estimada de ${(ESQUEMA.plusvaliaAnual * 100).toFixed(2)} % anual.</p></div>
+</div>
+<h2>Tabla de amortización</h2>
+<table class="am"><thead><tr><th>Pago</th><th>Fecha estimada</th><th>Concepto</th><th>Monto</th><th>Saldo restante</th></tr></thead><tbody>
+${c.plan.map((r) => `<tr><td>${r.k}</td><td>${r.fecha}</td><td>${r.concepto}</td><td>${money(r.monto)}</td><td>${money(r.resta)}</td></tr>`).join('')}
+</tbody><tfoot><tr><th colspan="3">Total</th><td>${money(c.plan.reduce((s, r) => s + r.monto, 0))}</td><td></td></tr></tfoot></table>
+<footer>Cotización ilustrativa con vigencia sujeta a disponibilidad. Precios y proyecciones sujetos a cambio sin previo aviso; las proyecciones de plusvalía y renta son estimaciones y no garantizan rendimientos futuros. Desarrolla ARREY.</footer>
+</body></html>`;
+}
+$('#cotPrint').addEventListener('click', () => {
+  if (!lastCalc) calc();
+  $('#printFrame')?.remove();
+  const f = document.createElement('iframe');
+  f.id = 'printFrame';
+  f.setAttribute('aria-hidden', 'true');
+  f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  document.body.appendChild(f);
+  const doc = f.contentDocument;
+  doc.open(); doc.write(cotizacionHTML(lastCalc)); doc.close();
+  const go = () => { f.contentWindow.focus(); f.contentWindow.print(); };
+  const img = doc.querySelector('img');
+  if (img && !img.complete) { img.onload = img.onerror = go; } else setTimeout(go, 150);
+});
 
 // Gráfica de proyección
 const chartPlot = $('#chartPlot'), chartTip = $('#chartTip');
@@ -550,19 +633,49 @@ ScrollTrigger.create({ trigger: '#cotizador', start: 'top 70%', once: true, onEn
 calc();
 
 /* ═══════════════════ CONTACTO ═══════════════════ */
-$('#contactForm').addEventListener('submit', (e) => {
+const form = $('#contactForm'), formMsg = $('#formMsg');
+const setMsg = (txt, ok) => { formMsg.textContent = txt; formMsg.className = 'form-msg ' + (ok ? 'is-ok' : 'is-err'); };
+function validate(needEmail) {
+  let ok = true;
+  ['nombre', 'tel', 'email'].forEach((n) => {
+    const i = form.elements[n];
+    const bad = n === 'email' ? (needEmail && !i.checkValidity()) || (i.value && !i.checkValidity()) || (needEmail && !i.value) : !i.value.trim();
+    i.classList.toggle('is-invalid', bad);
+    if (bad) ok = false;
+  });
+  if (!ok) setMsg(needEmail ? 'Completa nombre, teléfono y un correo válido.' : 'Completa nombre y teléfono.', false);
+  return ok;
+}
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const f = new FormData(e.target);
+  if (!validate(true)) return;
+  const btn = form.querySelector('[data-via="email"]');
+  btn.disabled = true; btn.textContent = 'Enviando…'; setMsg('', true);
+  try {
+    const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+    const data = await res.json().catch(() => ({ ok: false, msg: 'No pudimos enviar el correo. Escríbenos por WhatsApp, por favor.' }));
+    setMsg(data.msg, data.ok);
+    if (data.ok) form.reset();
+  } catch {
+    setMsg('No pudimos enviar el correo. Escríbenos por WhatsApp, por favor.', false);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Enviar por correo';
+  }
+});
+form.querySelector('[data-via="wa"]').addEventListener('click', () => {
+  if (!validate(false)) return;
+  const f = new FormData(form);
   const lines = [
     'Hola, quiero información de Viza Park.',
     `Nombre: ${f.get('nombre')}`,
     f.get('empresa') && `Empresa: ${f.get('empresa')}`,
     `Teléfono: ${f.get('tel')}`,
     f.get('email') && `Correo: ${f.get('email')}`,
-    f.get('nave') && `Nave de interés: ${f.get('nave')}`,
+    f.get('nave') && `Nave de interés: Nave ${f.get('nave')}`,
     f.get('msg') && `Mensaje: ${f.get('msg')}`,
   ].filter(Boolean);
   open(waLink(lines.join('\n')), '_blank', 'noopener');
+  setMsg('Abrimos WhatsApp con tu mensaje listo para enviar.', true);
 });
 
 /* ═══════════════════ VIDEO MODAL ═══════════════════ */

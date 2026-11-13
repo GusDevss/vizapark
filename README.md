@@ -30,12 +30,33 @@ export const CONTACTO = { telefono, whatsapp, instagram, ... };
 
 Para apartar una nave, agrega su número a `APARTADAS` y vuelve a publicar el sitio.
 
+## Formulario por correo (Hostinger)
+
+`public/contacto.php` envía el formulario con `mail()` de PHP. Edita la línea:
+
+```php
+$DESTINO = 'CAMBIAR@tudominio.com';
+```
+
+Conviene que el destino sea un correo creado en hPanel → Correos. El formulario también puede enviarse por WhatsApp.
+
+## SEO
+
+- Título, descripción, Open Graph y Twitter Cards en `index.html`.
+- Datos estructurados (LocalBusiness, Organization y FAQPage) y preguntas frecuentes generados desde `src/seo.js`.
+- `robots.txt` y `sitemap.xml` se generan al compilar.
+- Para URLs absolutas (canonical, og:url y sitemap), compila con el dominio:
+
+```bash
+SITE_URL=https://www.tudominio.com npm run build
+```
+
 ## Desarrollo
 
 ```bash
 npm install
 npm run dev      # servidor local
-npm run build    # genera /dist para publicar (Netlify, Vercel, hosting estático)
+npm run build    # genera /dist para publicar
 ```
 
-`/dist` es estático: se puede subir a cualquier hosting.
+Para Hostinger, sube el contenido de `/dist` a `public_html`.

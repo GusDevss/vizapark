@@ -3,23 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Viza Park · Parque Industrial en Querétaro</title>
-  <meta name="description" content="Viza Park: 64 naves industriales de 260 a 350 m² en Corregidora, Querétaro. Master plan interactivo, disponibilidad en tiempo real y cotizador con 30% de enganche y 18 MSI." />
-  <meta property="og:title" content="Viza Park · Inversión patrimonial premium" />
-  <meta property="og:description" content="Naves industriales pensadas en el futuro. Corregidora, Querétaro." />
-  <meta property="og:image" content="/assets/img/acceso.webp" />
+  <title>Naves Industriales en Venta en Querétaro | Viza Park</title>
+  <meta name="description" content="Naves industriales en venta de 260 a 350 m² en Corregidora, Querétaro. 30 % de enganche y 18 MSI, seguridad 24/7 y andén de carga. Consulta disponibilidad y cotiza." />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="author" content="Viza Park" />
+  <meta name="geo.region" content="MX-QUE" />
+  <meta name="geo.placename" content="Corregidora, Querétaro" />
+  <link rel="canonical" href="%SITE_URL%/" />
+  <!-- Open Graph / redes sociales -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_MX" />
+  <meta property="og:site_name" content="Viza Park" />
+  <meta property="og:url" content="%SITE_URL%/" />
+  <meta property="og:title" content="Viza Park · Naves industriales en venta en Querétaro" />
+  <meta property="og:description" content="64 naves de 260 a 350 m² en Corregidora. Inversión patrimonial premium con 30 % de enganche y 18 MSI." />
+  <meta property="og:image" content="%SITE_URL%/assets/og-vizapark.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Acceso del parque industrial Viza Park en Querétaro" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Viza Park · Naves industriales en venta en Querétaro" />
+  <meta name="twitter:description" content="64 naves de 260 a 350 m² en Corregidora, Querétaro. 30 % de enganche y 18 MSI." />
+  <meta name="twitter:image" content="%SITE_URL%/assets/og-vizapark.jpg" />
   <meta name="theme-color" content="#060d1d" />
-  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="preload" as="image" href="/assets/img/acceso.webp" />
+  <link rel="preload" as="image" href="/assets/img/hero-portada.webp" fetchpriority="high" />
+  <script type="application/ld+json">%JSON_LD%</script>
 </head>
 <body>
   <!-- ═════════ LOADER ═════════ -->
   <div class="loader" id="loader" aria-hidden="true">
     <div class="loader__inner">
-      <img src="/assets/brand/logo-blanco.png" alt="" class="loader__logo" />
+      <img width="700" height="396" src="/assets/brand/logo-blanco.png" alt="" class="loader__logo" />
       <div class="loader__bar"><span id="loaderBar"></span></div>
       <div class="loader__pct"><span id="loaderPct">0</span>%</div>
     </div>
@@ -31,7 +51,7 @@
 
   <!-- ═════════ NAV ═════════ -->
   <header class="nav" id="nav">
-    <a href="#top" class="nav__logo" aria-label="Viza Park inicio"><img src="/assets/brand/logo-blanco.png" alt="Viza Park" /></a>
+    <a href="#top" class="nav__logo" aria-label="Viza Park inicio"><img width="700" height="396" src="/assets/brand/logo-blanco.png" alt="Viza Park" /></a>
     <nav class="nav__links" aria-label="Principal">
       <a href="#recorrido">Recorrido</a>
       <a href="#nave">Nave tipo</a>
@@ -52,11 +72,12 @@
     <!-- ═════════ HERO ═════════ -->
     <section class="hero" id="hero">
       <div class="hero__media">
-        <img src="/assets/img/acceso.webp" alt="Acceso controlado de Viza Park" class="hero__img" />
+        <img width="1171" height="1081" src="/assets/img/hero-portada.webp" alt="Acceso controlado de Viza Park con caseta de vigilancia" class="hero__img" />
         <div class="hero__shade"></div>
       </div>
       <div class="hero__content">
-        <p class="eyebrow hero__eyebrow"><span class="dot"></span>Querétaro · México</p>
+        <img width="1188" height="673" src="/assets/brand/logo-alt.png" alt="Viza Park" class="hero__logo" />
+        <span class="hero__rule"></span>
         <h1 class="hero__title">
           <span class="line"><span>Inversión</span></span>
           <span class="line"><span>patrimonial</span></span>
@@ -67,12 +88,9 @@
           <a href="#masterplan" class="btn btn--orange magnetic">Ver disponibilidad</a>
           <a href="#cotizador" class="btn btn--ghost magnetic">Cotizar mi nave</a>
         </div>
+        <p class="hero__place">Querétaro <span class="dot"></span> México</p>
       </div>
       <div class="hero__scroll"><span>Desliza</span><i></i></div>
-      <div class="hero__badge">
-        <span class="hero__badge-num" data-count="64">64</span>
-        <span>naves<br/>industriales</span>
-      </div>
     </section>
 
     <!-- ═════════ RECORRIDO (secuencia) ═════════ -->
@@ -116,11 +134,11 @@
           <h2 class="h2">Pensadas en <span class="accent">el futuro</span></h2>
         </div>
         <div class="hgal__track" id="hgalTrack">
-          <figure class="hgal__card"><div class="hgal__img"><img src="/assets/img/vialidad.webp" alt="Vialidad interior de Viza Park" loading="lazy" /></div><figcaption><span>01</span>Vialidad</figcaption></figure>
-          <figure class="hgal__card"><div class="hgal__img"><img src="/assets/img/anden.webp" alt="Andén común de carga y descarga" loading="lazy" /></div><figcaption><span>02</span>Andén común de carga y descarga</figcaption></figure>
-          <figure class="hgal__card"><div class="hgal__img"><img src="/assets/img/vialidad-2.webp" alt="Calle interior con naves" loading="lazy" /></div><figcaption><span>03</span>Entorno ordenado</figcaption></figure>
-          <figure class="hgal__card"><div class="hgal__img"><img src="/assets/img/recepcion.webp" alt="Recepción de nave tipo" loading="lazy" /></div><figcaption><span>04</span>Recepción</figcaption></figure>
-          <figure class="hgal__card"><div class="hgal__img"><img src="/assets/img/almacen.webp" alt="Almacén de nave tipo" loading="lazy" /></div><figcaption><span>05</span>Almacén</figcaption></figure>
+          <figure class="hgal__card"><div class="hgal__img"><img width="2400" height="1080" decoding="async" src="/assets/img/vialidad.webp" alt="Vialidad interior de Viza Park" loading="lazy" /></div><figcaption><span>01</span>Vialidad</figcaption></figure>
+          <figure class="hgal__card"><div class="hgal__img"><img width="2400" height="1002" decoding="async" src="/assets/img/anden.webp" alt="Andén común de carga y descarga" loading="lazy" /></div><figcaption><span>02</span>Andén común de carga y descarga</figcaption></figure>
+          <figure class="hgal__card"><div class="hgal__img"><img width="2400" height="1080" decoding="async" src="/assets/img/vialidad-2.webp" alt="Calle interior con naves" loading="lazy" /></div><figcaption><span>03</span>Entorno ordenado</figcaption></figure>
+          <figure class="hgal__card"><div class="hgal__img"><img width="2000" height="914" decoding="async" src="/assets/img/recepcion.webp" alt="Recepción de nave tipo" loading="lazy" /></div><figcaption><span>04</span>Recepción</figcaption></figure>
+          <figure class="hgal__card"><div class="hgal__img"><img width="2000" height="916" decoding="async" src="/assets/img/almacen.webp" alt="Almacén de nave tipo" loading="lazy" /></div><figcaption><span>05</span>Almacén</figcaption></figure>
         </div>
         <div class="hgal__bar"><span id="hgalBar"></span></div>
       </div>
@@ -131,7 +149,7 @@
       <div class="nave__grid">
         <div class="nave__plan">
           <div class="nave__plan-frame">
-            <img src="/assets/img/nave-plano.webp" alt="Planta arquitectónica de nave tipo" loading="lazy" />
+            <img width="900" height="1620" decoding="async" src="/assets/img/nave-plano.webp" alt="Planta arquitectónica de nave tipo" loading="lazy" />
             <span class="pin" style="--x:22%;--y:86%">Recepción</span>
             <span class="pin" style="--x:16%;--y:76%">WC</span>
             <span class="pin" style="--x:50%;--y:40%">Almacén</span>
@@ -172,13 +190,10 @@
         <button class="chip" data-filter="disponible"><i class="sw sw--disp"></i>Disponibles</button>
         <button class="chip" data-filter="apartada"><i class="sw sw--apart"></i>Apartadas</button>
         <span class="mp__sep"></span>
-        <label class="mp__select">Módulo
-          <select id="mpModulo">
-            <option value="0">Todos</option>
-            <option value="1">Módulo 1</option><option value="2">Módulo 2</option><option value="3">Módulo 3</option>
-            <option value="4">Módulo 4</option><option value="5">Módulo 5</option><option value="6">Módulo 6</option>
-          </select>
-        </label>
+        <button class="chip chip--size is-active" data-size="all">Toda superficie</button>
+        <button class="chip chip--size" data-size="std">Hasta 260 m²</button>
+        <button class="chip chip--size" data-size="big">Más de 260 m²</button>
+        <span class="mp__result" id="mpResult" aria-live="polite"></span>
       </div>
 
       <div class="mp__body">
@@ -206,14 +221,14 @@
         <aside class="mp__panel" id="mpPanel" aria-live="polite">
           <div class="mp__empty" id="mpEmpty">
             <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true"><path d="M8 40V18l16-10 16 10v22" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 40V26h16v14" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-            <p>Selecciona una nave en el plano para ver su superficie, módulo, estatus y precio estimado.</p>
+            <p>Selecciona una nave en el plano para ver su superficie, estatus y precio estimado.</p>
           </div>
           <div class="mp__detail" id="mpDetail" hidden>
             <span class="badge" id="mdBadge">Disponible</span>
             <h3 class="mp__name">Nave <span id="mdNum">—</span></h3>
             <dl class="mp__dl">
               <div><dt>Superficie</dt><dd><span id="mdM2">—</span> m²</dd></div>
-              <div><dt>Módulo</dt><dd id="mdMod">—</dd></div>
+              <div><dt>Precio por m²</dt><dd id="mdPm2">—</dd></div>
               <div><dt>Precio de lista</dt><dd id="mdPrice">—</dd></div>
               <div><dt>Enganche 30 %</dt><dd id="mdEng">—</dd></div>
               <div><dt>18 MSI de</dt><dd id="mdMsi">—</dd></div>
@@ -222,10 +237,9 @@
             <a class="btn btn--ghost btn--block" id="mdWa" target="_blank" rel="noopener">Preguntar por WhatsApp</a>
           </div>
           <div class="mp__mods">
-            <p class="mp__mods-t">Módulos</p>
+            <p class="mp__mods-t">Amenidades en el plano</p>
             <ol>
-              <li data-mod="1"><b>1</b>520 m²</li><li data-mod="2"><b>2</b>1,040 m²</li><li data-mod="3"><b>3</b>2,658 m²</li>
-              <li data-mod="4"><b>4</b>1,560 m²</li><li data-mod="5"><b>5</b>6,835 m²</li><li data-mod="6"><b>6</b>4,084 m²</li>
+              <li><b>A</b>Acceso controlado</li><li><b>B</b>Andén común de carga</li><li><b>C</b>Áreas verdes</li>
             </ol>
           </div>
         </aside>
@@ -234,7 +248,7 @@
 
     <!-- ═════════ AÉREA / DESARROLLO INTEGRAL ═════════ -->
     <section class="integral section" id="integral">
-      <div class="integral__img"><img src="/assets/img/aerea.webp" alt="Vista aérea del desarrollo" loading="lazy" /></div>
+      <div class="integral__img"><img width="1100" height="900" decoding="async" src="/assets/img/aerea.webp" alt="Vista aérea del desarrollo" loading="lazy" /></div>
       <div class="integral__txt">
         <p class="eyebrow">Desarrollo integral</p>
         <h2 class="h2">Todo lo que tu operación <span class="accent">necesita</span></h2>
@@ -253,20 +267,32 @@
 
     <!-- ═════════ UBICACIÓN ═════════ -->
     <section class="ubi section" id="ubicacion">
-      <div class="ubi__map">
-        <img src="/assets/img/mapa-satelital.webp" alt="Mapa satelital con puntos de interés cercanos a Viza Park" loading="lazy" />
-        <div class="ubi__rings" style="--x:22.4%;--y:60.5%"><i></i><i></i><i></i><b></b></div>
+      <div class="ubi__mapwrap">
+        <div class="tabs" role="tablist" aria-label="Tipo de mapa">
+          <button class="tab is-active" role="tab" aria-selected="true" data-map="vial">Mapa vial</button>
+          <button class="tab" role="tab" aria-selected="false" data-map="sat">Satélite</button>
+        </div>
+        <div class="ubi__map">
+          <img src="/assets/img/mapa-vial.webp" width="1231" height="1081" alt="Mapa de ubicación de Viza Park sobre Av. Tlacote, cerca de 5 de Febrero, Constituyentes, Bernardo Quintana y la carretera Querétaro – Celaya" loading="lazy" decoding="async" class="ubi__img is-on" data-map="vial" />
+          <img src="/assets/img/mapa-satelital.webp" width="1600" height="1333" alt="Mapa satelital de Querétaro con hospitales, escuelas y gasolineras en un radio de 3 a 5 km de Viza Park" loading="lazy" decoding="async" class="ubi__img" data-map="sat" />
+        </div>
       </div>
       <div class="ubi__txt">
         <p class="eyebrow">Ubicación privilegiada</p>
         <h2 class="h2">En el corazón <span class="accent">logístico</span> de Querétaro</h2>
-        <p class="lead">Cerca de las mayores vialidades de la ciudad: Constituyentes, 5 de Febrero, Bernardo Quintana y la carretera Querétaro – Celaya.</p>
+        <p class="lead">A 5 minutos de Av. 5 de Febrero y del centro de Querétaro, con salida directa a Constituyentes, Bernardo Quintana y la carretera Querétaro – Celaya.</p>
+        <h3 class="ubi__h3">Cerca de todo</h3>
+        <ul class="places">
+          <li>Hospital Ángeles</li><li>Sam's Club</li><li>Liverpool</li><li>UAQ</li><li>Centro Histórico</li>
+          <li>Los Arcos</li><li>Chedraui</li><li>Estadio Corregidora</li><li>Plaza de toros</li><li>Walmart</li><li>Outlets</li>
+        </ul>
+        <h3 class="ubi__h3">Servicios a la redonda</h3>
         <div class="radios">
           <div class="radio"><span class="radio__km">3 km</span><ul><li>Unidad Médica Familiar No. 9</li><li>Escuela J.F.K.</li><li>Gasolinera</li></ul></div>
           <div class="radio"><span class="radio__km">4 km</span><ul><li>Universidad Autónoma de Querétaro</li><li>Hospital</li><li>Gasolinera</li></ul></div>
           <div class="radio"><span class="radio__km">5 km</span><ul><li>Hospital</li><li>Gasolinera</li><li>Escuela</li></ul></div>
         </div>
-        <p class="addr" id="addr"></p>
+        <address class="addr">Carretera Estatal Km 3 S/N, Santa María Magdalena, 76177 Corregidora, Qro.</address>
         <a class="btn btn--ghost magnetic" id="mapsLink" target="_blank" rel="noopener">Abrir en Google Maps ↗</a>
       </div>
     </section>
@@ -279,7 +305,7 @@
         <p class="lead">Una nave en Viza Park se adapta a las industrias que hoy mueven la economía del Bajío.</p>
       </div>
       <div class="orbit" id="orbit">
-        <div class="orbit__core"><img src="/assets/brand/logo-blanco.png" alt="" /></div>
+        <div class="orbit__core"><img width="700" height="396" src="/assets/brand/logo-blanco.png" alt="" /></div>
         <div class="orbit__ring" id="orbitRing">
           <span>Alimentos</span><span>Construcción</span><span>Automotriz</span><span>Manufactura</span><span>Aeroespacial</span>
           <span>Comercio</span><span>Tecnología</span><span>Tecnología cuántica</span><span>Aeronáutico</span><span>Electrodoméstico</span>
@@ -337,49 +363,74 @@
             <table class="sr-only" id="chartTable"><caption>Proyección del valor</caption><tbody></tbody></table>
           </div>
 
+          <details class="amort" id="amort" open>
+            <summary>Tabla de amortización <span id="amortSum"></span></summary>
+            <div class="amort__wrap">
+              <table class="amort__table">
+                <thead><tr><th scope="col">Pago</th><th scope="col">Fecha estimada</th><th scope="col">Concepto</th><th scope="col">Monto</th><th scope="col">Saldo restante</th></tr></thead>
+                <tbody id="amortBody"></tbody>
+                <tfoot><tr><th colspan="3" scope="row">Total</th><td id="amortTotal"></td><td></td></tr></tfoot>
+              </table>
+            </div>
+          </details>
+
           <div class="cot__ctas">
             <a class="btn btn--orange magnetic" id="cotWa" target="_blank" rel="noopener">Enviar cotización por WhatsApp</a>
-            <button class="btn btn--ghost" id="cotPrint" type="button">Imprimir / PDF</button>
+            <button class="btn btn--ghost" id="cotPrint" type="button">Descargar PDF</button>
           </div>
           <p class="disclaimer">Cotización ilustrativa. Precios, disponibilidad y proyecciones sujetos a cambio sin previo aviso; las proyecciones de plusvalía y renta son estimaciones y no garantizan rendimientos futuros.</p>
         </div>
       </div>
     </section>
 
+    <!-- ═════════ PREGUNTAS FRECUENTES ═════════ -->
+    <section class="faq section" id="preguntas">
+      <div class="faq__head">
+        <p class="eyebrow">Preguntas frecuentes</p>
+        <h2 class="h2">Todo sobre <span class="accent">Viza Park</span></h2>
+      </div>
+      <div class="faq__list" id="faqList">%FAQ_HTML%</div>
+    </section>
+
     <!-- ═════════ CONTACTO ═════════ -->
     <section class="contact section" id="contacto">
-      <div class="contact__bg"><img src="/assets/img/vialidad-2.webp" alt="" loading="lazy" /></div>
+      <div class="contact__bg"><img width="2400" height="1080" decoding="async" src="/assets/img/vialidad-2.webp" alt="" loading="lazy" /></div>
       <div class="contact__grid">
         <div>
           <p class="eyebrow">Contacto</p>
           <h2 class="h2 h2--xl">Impulsemos <span class="accent">tu empresa</span></h2>
           <ul class="contact__list">
-            <li><a id="cTel"></a></li>
-            <li><a id="cIg" target="_blank" rel="noopener">@vizaparkqueretaro</a></li>
+            <li><a id="cTel" href="tel:+524424949833">442 494 9833</a></li>
+            <li><a id="cIg" href="https://www.instagram.com/vizaparkqueretaro/" target="_blank" rel="noopener">@vizaparkqueretaro</a></li>
             <li><a id="cFb" target="_blank" rel="noopener">Viza Park Querétaro</a></li>
           </ul>
         </div>
-        <form class="contact__form" id="contactForm">
+        <form class="contact__form" id="contactForm" action="/contacto.php" method="post" novalidate>
           <div class="row2">
-            <label class="field"><span>Nombre</span><input name="nombre" required autocomplete="name" /></label>
-            <label class="field"><span>Empresa</span><input name="empresa" autocomplete="organization" /></label>
+            <label class="field"><span>Nombre *</span><input name="nombre" required maxlength="100" autocomplete="name" /></label>
+            <label class="field"><span>Empresa</span><input name="empresa" maxlength="120" autocomplete="organization" /></label>
           </div>
           <div class="row2">
-            <label class="field"><span>Teléfono</span><input name="tel" type="tel" required autocomplete="tel" /></label>
-            <label class="field"><span>Correo</span><input name="email" type="email" autocomplete="email" /></label>
+            <label class="field"><span>Teléfono *</span><input name="tel" type="tel" required maxlength="20" autocomplete="tel" /></label>
+            <label class="field"><span>Correo *</span><input name="email" type="email" required maxlength="120" autocomplete="email" /></label>
           </div>
           <label class="field"><span>Nave de interés</span><select name="nave" id="contactNave"></select></label>
-          <label class="field"><span>Mensaje</span><textarea name="msg" rows="3" placeholder="Me interesa agendar una visita…"></textarea></label>
-          <button class="btn btn--orange btn--block magnetic" type="submit">Enviar por WhatsApp</button>
+          <label class="field"><span>Mensaje</span><textarea name="msg" rows="3" maxlength="1500" placeholder="Me interesa agendar una visita…"></textarea></label>
+          <label class="hp" aria-hidden="true">No llenar<input name="website" tabindex="-1" autocomplete="off" /></label>
+          <div class="contact__btns">
+            <button class="btn btn--orange magnetic" type="submit" data-via="email">Enviar por correo</button>
+            <button class="btn btn--wa magnetic" type="button" data-via="wa">Enviar por WhatsApp</button>
+          </div>
+          <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
         </form>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <img src="/assets/brand/logo-blanco.png" alt="Viza Park" class="footer__logo" />
-    <p class="footer__addr" id="footAddr"></p>
-    <div class="footer__dev"><span>Desarrollador</span><img src="/assets/brand/arrey-blanco.png" alt="ARREY" /></div>
+    <img width="700" height="396" src="/assets/brand/logo-blanco.png" alt="Viza Park" class="footer__logo" />
+    <address class="footer__addr">Viza Park · Parque industrial en Corregidora, Querétaro<br />Carretera Estatal Km 3 S/N, Santa María Magdalena, 76177 Corregidora, Qro. · <a href="tel:+524424949833">442 494 9833</a></address>
+    <div class="footer__dev"><span>Desarrollador</span><img width="300" height="142" src="/assets/brand/arrey-blanco.png" alt="ARREY" /></div>
     <p class="footer__copy">© <span id="year"></span> Viza Park. Todos los derechos reservados.</p>
   </footer>
 

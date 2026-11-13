@@ -1,0 +1,13 @@
+{
+  "name": "Viza Park · Parque Industrial en Querétaro",
+  "short_name": "Viza Park",
+  "lang": "es-MX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#060d1d",
+  "theme_color": "#060d1d",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
