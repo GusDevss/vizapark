@@ -30,7 +30,9 @@ $$('a[href^="#"]').forEach((a) =>
 /* ───────────── Contact data ───────────── */
 const waLink = (msg) => `https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(msg)}`;
 $('#waFloat').href = waLink('Hola, me interesa información de Viza Park.');
-$('#cFb').href = CONTACTO.facebook;
+$("#cFb").href = $("#fFb").href = CONTACTO.facebook;
+$("#cWa").href = $("#fWa").href = waLink("Hola, me interesa agendar una visita a Viza Park.");
+$("#cMaps").href = CONTACTO.maps;
 $('#mapsLink').href = CONTACTO.maps;
 $('#year').textContent = new Date().getFullYear();
 
@@ -84,8 +86,8 @@ function preload() {
       frames.push(img);
     }
     // primero los cuadros críticos, luego el resto
-    frames.forEach((img, i) => { if (i < CRITICAL) img.src = `/assets/seq/f${String(i + 1).padStart(3, '0')}.webp`; });
-    const rest = () => frames.forEach((img, i) => { if (i >= CRITICAL) img.src = `/assets/seq/f${String(i + 1).padStart(3, '0')}.webp`; });
+    frames.forEach((img, i) => { if (i < CRITICAL) img.src = `/assets/recorrido/f${String(i + 1).padStart(3, '0')}.webp`; });
+    const rest = () => frames.forEach((img, i) => { if (i >= CRITICAL) img.src = `/assets/recorrido/f${String(i + 1).padStart(3, '0')}.webp`; });
     addEventListener('load', () => setTimeout(rest, 200), { once: true });
     setTimeout(resolve, 3500); // nunca bloquear más de 3.5 s
   });
