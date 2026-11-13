@@ -527,8 +527,67 @@ function renderAmort(rows, contado) {
   $('#amortSum').textContent = contado ? 'Pago único de contado' : `${rows.length - 1} mensualidades sin intereses`;
 }
 
-/* PDF de la cotización: documento limpio en un iframe oculto (1–2 páginas) */
+/* Medidas de referencia: módulo de 10.40 m de frente (plano arquitectónico) */
+const FRENTE = 10.4;
+const IRREGULAR = [14, 35];
+function medidas(nv) {
+  if (IRREGULAR.includes(nv.n)) return { irregular: true, frente: FRENTE, fondo: 25 };
+  return { irregular: false, frente: FRENTE, fondo: nv.m2 / FRENTE };
+}
+
+/* Plano del parque para el PDF con la nave elegida resaltada */
+function planoPDF(sel) {
+  const pts = (p) => p.map((q) => q.join(',')).join(' ');
+  const naves = NAVES.map((nv) => {
+    const isSel = nv.n === sel.n;
+    const fill = isSel ? '#f26b1d' : nv.estado === 'disponible' ? '#c9d8f2' : '#d5d8df';
+    const xs = nv.pts.map((p) => p[0]), ys = nv.pts.map((p) => p[1]);
+    const cx = IRREGULAR.includes(nv.n) ? Math.max(...xs) - 18 : (Math.min(...xs) + Math.max(...xs)) / 2;
+    const cy = (Math.min(...ys) + Math.max(...ys)) / 2 + 4;
+    return `<polygon points="${pts(nv.pts)}" fill="${fill}" stroke="#fff" stroke-width="2"/>` +
+      (nv.estado === 'apartada' && !isSel ? `<polygon points="${pts(nv.pts)}" fill="url(#h)"/>` : '') +
+      `<text x="${cx}" y="${cy}" font-size="${isSel ? 15 : 11}" font-weight="700" text-anchor="middle" fill="${isSel ? '#fff' : '#55607a'}">${String(nv.n).padStart(2, '0')}</text>`;
+  }).join('');
+  const s = sel.pts, sx = s.map((p) => p[0]), sy = s.map((p) => p[1]);
+  const mx = (Math.min(...sx) + Math.max(...sx)) / 2, my = (Math.min(...sy) + Math.max(...sy)) / 2;
+  return `<svg viewBox="-45 0 830 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ubicación de la nave ${sel.n} en el master plan">
+<defs><pattern id="h" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#9aa1b0" stroke-width="2"/></pattern></defs>
+<polygon points="485,30 775,30 775,995 70,990 -35,980" fill="#f1f3f7" stroke="#9aa1b0" stroke-width="2"/>
+<polygon points="485,30 515,30 -7,980 -35,980" fill="#cfe0c3"/><rect x="722" y="30" width="53" height="965" fill="#cfe0c3"/>
+<rect x="520" y="405" width="40" height="108" fill="url(#h)" stroke="#9aa1b0"/>
+<text x="545" y="20" font-size="16" font-weight="700" text-anchor="middle" fill="#55607a">ACCESO</text>
+${naves}
+<circle cx="${mx}" cy="${my}" r="46" fill="none" stroke="#f26b1d" stroke-width="4" stroke-dasharray="8 6"/>
+</svg>`;
+}
+
+/* Dibujo de la nave con cotas */
+function cotasPDF(nv) {
+  const m = medidas(nv);
+  const W = 420, H = 210, L = 70, T = 30;
+  const fondoPx = 300, frentePx = Math.min(150, fondoPx * (m.frente / m.fondo));
+  const x0 = L, y0 = T + (150 - frentePx) / 2, x1 = x0 + fondoPx, y1 = y0 + frentePx;
+  const shape = m.irregular
+    ? `<polygon points="${x0 + 70},${y0} ${x1},${y0} ${x1},${y1} ${x0},${y1}" fill="#fde7da" stroke="#f26b1d" stroke-width="3"/>`
+    : `<rect x="${x0}" y="${y0}" width="${fondoPx}" height="${frentePx}" fill="#fde7da" stroke="#f26b1d" stroke-width="3"/>`;
+  const fmtM = (v) => v.toFixed(2) + ' m';
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Medidas de la nave ${nv.n}">
+<defs><marker id="a" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0a1530"/></marker></defs>
+${shape}
+<rect x="${x1 - 6}" y="${y0 + frentePx * 0.3}" width="6" height="${frentePx * 0.4}" fill="#0a1530"/>
+<text x="${x1 - 12}" y="${y0 + frentePx * 0.3 - 6}" font-size="10" text-anchor="end" fill="#55607a">Cortina / andén</text>
+<text x="${(x0 + x1) / 2}" y="${(y0 + y1) / 2}" font-size="17" font-weight="800" text-anchor="middle" fill="#0a1530">NAVE ${String(nv.n).padStart(2, '0')}</text>
+<text x="${(x0 + x1) / 2}" y="${(y0 + y1) / 2 + 20}" font-size="14" text-anchor="middle" fill="#c4541a" font-weight="700">${nv.m2.toFixed(2)} m²</text>
+<line x1="${x0}" y1="${y1 + 22}" x2="${x1}" y2="${y1 + 22}" stroke="#0a1530" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="${(x0 + x1) / 2}" y="${y1 + 38}" font-size="13" font-weight="700" text-anchor="middle" fill="#0a1530">Fondo ${m.irregular ? 'variable' : fmtM(m.fondo)}</text>
+<line x1="${x0 - 22}" y1="${y0}" x2="${x0 - 22}" y2="${y1}" stroke="#0a1530" marker-start="url(#a)" marker-end="url(#a)"/>
+<text x="${x0 - 30}" y="${(y0 + y1) / 2}" font-size="13" font-weight="700" text-anchor="middle" fill="#0a1530" transform="rotate(-90 ${x0 - 30} ${(y0 + y1) / 2})">Frente ${fmtM(m.frente)}</text>
+</svg>`;
+}
+
+/* PDF de la cotización: documento limpio en un iframe oculto */
 function cotizacionHTML(c) {
+  const m = medidas(c.nv);
   const hoy = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
   const folio = `VP-${c.nv.n}-${Date.now().toString().slice(-6)}`;
   const vals = [1, 2, 3].map((i) => c.base * (1 + ESQUEMA.plusvaliaAnual) ** i);
@@ -547,6 +606,11 @@ table{width:100%;border-collapse:collapse}th,td{padding:6px 8px;border-bottom:1p
 .am td:nth-child(-n+3),.am th:nth-child(-n+3){text-align:left}.am tr{page-break-inside:avoid}.am tfoot th,.am tfoot td{font-weight:700;border-top:2px solid #0a1530}
 .box{background:#f4f1ea;border-radius:8px;padding:12px 14px}.big{font-size:26px;font-weight:800;margin:2px 0}
 footer{margin-top:18px;padding-top:10px;border-top:1px solid #e3e6ee;font-size:10px;color:#6b7590}
+.plan{display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:center;page-break-inside:avoid}
+.plan svg{width:100%;height:auto;display:block}.plan .map{border:1px solid #e3e6ee;border-radius:8px;padding:6px}
+.legend{display:flex;gap:10px;white-space:nowrap;font-size:9.5px;color:#55607a;margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.specs{font-size:11px;color:#55607a;margin:6px 0 0}.specs b{color:#0a1530}
+.am-wrap{page-break-before:always}
 </style></head><body>
 <header><img src="${location.origin}/assets/brand/logo-alt.png" alt="Viza Park"><div><b>Cotización ${folio}</b><br>${hoy}<br>Tel. ${CONTACTO.telefono}</div></header>
 <h1>Nave ${String(c.nv.n).padStart(2, '0')} · ${c.nv.m2.toFixed(2)} m²</h1>
@@ -557,10 +621,20 @@ footer{margin-top:18px;padding-top:10px;border-top:1px solid #e3e6ee;font-size:1
  <div><h2>Proyección del activo</h2><table class="sum">${row('Valor hoy', money(c.base))}${vals.map((v, i) => row(`Año ${i + 1}`, money(v))).join('')}</table>
   <p style="color:#6b7590;font-size:10px">Plusvalía estimada de ${(ESQUEMA.plusvaliaAnual * 100).toFixed(2)} % anual.</p></div>
 </div>
+<h2>Tu nave en el master plan</h2>
+<div class="plan">
+ <div class="map">${planoPDF(c.nv)}
+  <div class="legend"><span><i style="background:#f26b1d"></i>Tu nave</span><span><i style="background:#c9d8f2"></i>Disponible</span><span><i style="background:#d5d8df"></i>Apartada</span></div></div>
+ <div>${cotasPDF(c.nv)}
+  <p class="specs"><b>Superficie:</b> ${c.nv.m2.toFixed(2)} m² · <b>Frente:</b> ${m.frente.toFixed(2)} m · <b>Fondo:</b> ${m.irregular ? 'variable (nave en esquina, forma irregular)' : m.fondo.toFixed(2) + ' m'}</p>
+  <p class="specs">Incluye recepción, sanitario, almacén, 3 cajones de estacionamiento y rampa para andén. Medidas de referencia; consulta el plano ejecutivo para medidas definitivas.</p></div>
+</div>
+<div class="am-wrap">
 <h2>Tabla de amortización</h2>
 <table class="am"><thead><tr><th>Pago</th><th>Fecha estimada</th><th>Concepto</th><th>Monto</th><th>Saldo restante</th></tr></thead><tbody>
 ${c.plan.map((r) => `<tr><td>${r.k}</td><td>${r.fecha}</td><td>${r.concepto}</td><td>${money(r.monto)}</td><td>${money(r.resta)}</td></tr>`).join('')}
 </tbody><tfoot><tr><th colspan="3">Total</th><td>${money(c.plan.reduce((s, r) => s + r.monto, 0))}</td><td></td></tr></tfoot></table>
+</div>
 <footer>Cotización ilustrativa con vigencia sujeta a disponibilidad. Precios y proyecciones sujetos a cambio sin previo aviso; las proyecciones de plusvalía y renta son estimaciones y no garantizan rendimientos futuros. Desarrolla ARREY.</footer>
 </body></html>`;
 }
@@ -679,6 +753,11 @@ form.querySelector('[data-via="wa"]').addEventListener('click', () => {
   open(waLink(lines.join('\n')), '_blank', 'noopener');
   setMsg('Abrimos WhatsApp con tu mensaje listo para enviar.', true);
 });
+
+/* ═══════════════════ FAQ: solo una abierta a la vez ═══════════════════ */
+$$('.faq__item').forEach((d) => d.addEventListener('toggle', () => {
+  if (d.open) $$('.faq__item').forEach((o) => { if (o !== d && o.open) o.open = false; });
+}));
 
 /* ═══════════════════ VIDEO MODAL ═══════════════════ */
 const modal = $('#videoModal');

@@ -38,7 +38,7 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, 
 
 export function faqHtml() {
   return FAQ.map(([q, a], i) =>
-    `<details class="faq__item"${i === 0 ? ' open' : ''}><summary><h3>${esc(q)}</h3><span class="faq__icon" aria-hidden="true"></span></summary><p>${esc(a)}</p></details>`
+    `<details class="faq__item" name="faq"${i === 0 ? ' open' : ''}><summary><h3>${esc(q)}</h3><span class="faq__icon" aria-hidden="true"></span></summary><p>${esc(a)}</p></details>`
   ).join('\n');
 }
 
