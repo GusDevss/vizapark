@@ -528,7 +528,8 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .modal__close { position: absolute; top: 20px; right: 24px; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line-2); background: transparent; font-size: 28px; cursor: pointer; }
 
 /* WhatsApp float */
-.wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 95; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: #25d366; color: #fff; box-shadow: 0 12px 30px rgba(37,211,102,.35); }
+.wa-float { position: fixed; right: 22px; bottom: 22px; z-index: 95; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: #25d366; color: #fff; box-shadow: 0 12px 30px rgba(37,211,102,.35); transition: background .3s, box-shadow .3s; }
+.wa-float:hover { background: #1ebe5b; box-shadow: 0 14px 36px rgba(37,211,102,.5); }
 
 /* Selects: opciones legibles en el menú nativo */
 select option { color: #0a1530; background: #fff; }
