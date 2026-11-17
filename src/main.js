@@ -251,8 +251,8 @@ specItems.forEach((li) => {
   li.addEventListener('mouseleave', () => showZone(null));
   li.addEventListener('blur', () => showZone(null));
 });
-gsap.timeline({ scrollTrigger: { trigger: '#nave', start: 'top 65%' } })
-  .to('.nave__plan-frame', { clipPath: 'inset(0% 0 0 0 round 18px)', duration: 1.4, ease: 'expo.inOut' })
+gsap.timeline({ scrollTrigger: { trigger: '#nave', start: 'top 92%' } })
+  .from('.nave__plan-frame img', { scale: 1.06, duration: 0.9, ease: 'power3.out', clearProps: 'transform' })
   .add(() => {
     // pequeño recorrido automático para mostrar la interacción
     if (reduced || userTouched) return;
@@ -289,7 +289,6 @@ ScrollTrigger.create({ trigger: '#integral', start: 'top 80%', end: 'bottom top'
 $$('.ubi .tab').forEach((t) => t.addEventListener('click', () => {
   $$('.ubi .tab').forEach((x) => { x.classList.toggle('is-active', x === t); x.setAttribute('aria-selected', String(x === t)); });
   $$('.ubi__img').forEach((img) => img.classList.toggle('is-on', img.dataset.map === t.dataset.map));
-  $('.ubi__logo').classList.toggle('is-off', t.dataset.map !== 'vial');
 }));
 gsap.from('.ubi__map', {
   clipPath: 'inset(12% 12% 12% 12% round 24px)', duration: 1.6, ease: 'expo.out',

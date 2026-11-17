@@ -111,8 +111,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .nav.is-scrolled .nav__logo img { height: 46px; }
 .nav > .btn { padding: 14px 24px; font-size: 14px; }
 @media (max-width: 760px) { .nav__logo img { height: 48px; } .nav.is-scrolled .nav__logo img { height: 42px; } }
-.ubi__logo { position: absolute; left: 3.6%; top: 31.2%; width: 19%; height: auto; z-index: 2; pointer-events: none; transition: opacity .5s; }
-.ubi__logo.is-off { opacity: 0; }
 .cot__note { margin: 0; font-size: 13px; color: #5b6476; display: flex; align-items: center; gap: 8px; }
 .cot__note::before { content: '✓'; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--orange); color: #fff; font-size: 12px; }
 .nav__links { display: flex; gap: 34px; margin-left: auto; }
@@ -231,7 +229,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .nave .lead strong { color: var(--ink-900); }
 .nave__grid { display: grid; grid-template-columns: minmax(260px, 420px) 1fr; gap: clamp(40px, 8vw, 140px); align-items: center; max-width: 1400px; margin: 0 auto; }
 .nave__plan-frame img { max-height: 78vh; width: auto; margin: 0 auto; }
-.nave__plan-frame { position: relative; width: fit-content; margin: 0 auto; border-radius: var(--radius); overflow: hidden; background: #fff; box-shadow: 0 40px 80px -40px rgba(6,13,29,.35); clip-path: inset(100% 0 0 0 round var(--radius)); }
+.nave__plan-frame { position: relative; width: fit-content; margin: 0 auto; border-radius: var(--radius); overflow: hidden; background: #fff; box-shadow: 0 40px 80px -40px rgba(6,13,29,.35); }
 /* Zonas de la planta */
 .zone {
   position: absolute; left: var(--l); top: var(--t); width: var(--w); height: var(--h);
