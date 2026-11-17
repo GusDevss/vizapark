@@ -125,12 +125,20 @@ addEventListener('resize', () => sizeCanvas());
 
 /* ───────────── Nav ───────────── */
 const nav = $('#nav');
+const toTop = $('#toTop'), toTopRing = $('#toTopRing');
 ScrollTrigger.create({
   start: 0, end: 'max',
   onUpdate(self) {
     nav.classList.toggle('is-scrolled', self.scroll() > 40);
     $('#navProgress').style.transform = `scaleX(${self.progress})`;
+    toTop.classList.toggle('is-on', self.scroll() > innerHeight * 0.8);
+    toTopRing.style.strokeDashoffset = String(163.4 * (1 - self.progress));
   },
+});
+/* Botón flotante: volver arriba */
+toTop.addEventListener('click', () => {
+  if (lenis) lenis.scrollTo(0, { duration: 1.6 });
+  else scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
 });
 $$('.nav__links a').forEach((a) => {
   const sec = $(a.getAttribute('href'));
