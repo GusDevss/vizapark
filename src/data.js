@@ -6,16 +6,18 @@
 /** Naves apartadas / vendidas (según Excel de ventas, nov 2026). */
 export const APARTADAS = [1, 2, 4, 5, 6, 11, 12, 33, 34, 47, 48];
 
-/** Precio de lista por m² (MXN, antes de IVA). Ajustar según lista vigente. */
-export const PRECIO_M2 = 13500;
+/** Precio de lista de una nave de 260 m² (MXN, IVA incluido). Las demás naves
+ *  se calculan proporcional a su superficie. */
+export const PRECIO_260 = 4985000;
+export const PRECIO_M2 = PRECIO_260 / 260; // ≈ $19,173 por m², IVA incluido
+export const precioNave = (nv) => Math.round((nv.m2 * PRECIO_260) / 260);
 
 /** Esquema de financiamiento vigente */
 export const ESQUEMA = {
   enganche: 0.30,       // 30 % de enganche
   meses: 18,            // 18 MSI sobre el 70 % restante
-  iva: 0.16,
   plusvaliaAnual: 0.1795, // rendimiento en plusvalía anual (presentación comercial)
-  retornoRenta: 0.10,     // retorno por renta anual antes de IVA
+  retornoRenta: 0.10,     // renta anual estimada (antes de IVA) sobre el precio de la nave
 };
 
 export const CONTACTO = {

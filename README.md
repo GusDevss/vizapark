@@ -23,7 +23,7 @@ Todo está en **`src/data.js`**:
 
 ```js
 export const APARTADAS = [1, 2, 4, 5, 6, 11, 12, 33, 34, 47, 48]; // naves apartadas/vendidas
-export const PRECIO_M2 = 13500;                                     // precio de lista por m² (antes de IVA)
+export const PRECIO_260 = 4985000;                                  // precio de una nave de 260 m², IVA incluido (las demás: proporcional al metraje)
 export const ESQUEMA = { enganche: 0.30, meses: 18, ... };
 export const CONTACTO = { telefono, whatsapp, instagram, ... };
 ```

@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 //  SEO · se inyecta en index.html al compilar (vite.config.js)
 // ─────────────────────────────────────────────────────────────
-import { NAVES, PRECIO_M2, ESQUEMA, CONTACTO, fmt } from './data.js';
+import { NAVES, PRECIO_260, precioNave, ESQUEMA, CONTACTO, fmt } from './data.js';
 
 /**
  * Dominio final del sitio, SIN diagonal al final. Ej.: 'https://www.vizapark.com.mx'
@@ -10,16 +10,16 @@ import { NAVES, PRECIO_M2, ESQUEMA, CONTACTO, fmt } from './data.js';
  */
 export const SITE_URL = (process.env.SITE_URL || '').replace(/\/$/, '');
 
-const desde = Math.min(...NAVES.map((n) => n.m2 * PRECIO_M2));
+const desde = Math.min(...NAVES.map(precioNave));
 const disp = NAVES.filter((n) => n.estado === 'disponible').length;
 
 export const FAQ = [
   ['¿Dónde se ubica Viza Park?',
     `Viza Park está en ${CONTACTO.direccion}, a 5 minutos de Av. 5 de Febrero y del centro de Querétaro, con conexión a Constituyentes, Bernardo Quintana y la carretera Querétaro – Celaya.`],
-  ['¿Qué tamaño tienen las naves industriales?',
-    'El parque cuenta con 64 naves industriales de 236 a 350 m². Cada nave tipo incluye recepción, sanitario, almacén, 3 cajones de estacionamiento y rampa para andén.'],
+  ['¿Qué tamaño tienen las naves comerciales?',
+    'El parque cuenta con 64 naves comerciales de 236 a 350 m². Cada nave tipo incluye recepción, sanitario, almacén, 3 cajones de estacionamiento y rampa para andén.'],
   ['¿Cuál es el precio de una nave en Viza Park?',
-    `El precio de lista parte de ${fmt(desde)} más IVA (${fmt(PRECIO_M2)} por m²). Puedes calcular el precio exacto de cada nave disponible en el cotizador del sitio.`],
+    `Una nave de 260 m² tiene un precio de lista de ${fmt(PRECIO_260)} con IVA incluido; las demás naves se cotizan proporcional a su superficie, desde ${fmt(desde)}. Puedes calcular el precio exacto de cada nave disponible en el cotizador del sitio.`],
   ['¿Qué esquema de financiamiento ofrecen?',
     `Puedes adquirir tu nave con ${Math.round(ESQUEMA.enganche * 100)} % de enganche y ${ESQUEMA.meses} meses sin intereses sobre el ${Math.round((1 - ESQUEMA.enganche) * 100)} % restante. También hay opción de pago de contado.`],
   ['¿Cuántas naves hay disponibles?',
@@ -66,7 +66,7 @@ export function jsonLd() {
       address, areaServed: 'Querétaro', parentOrganization: { '@id': '#organizacion' },
       makesOffer: {
         '@type': 'Offer', priceCurrency: 'MXN', price: Math.round(desde), availability: 'https://schema.org/InStock',
-        itemOffered: { '@type': 'Product', name: 'Nave industrial de 260 m²', description: 'Nave industrial con recepción, sanitario, almacén, 3 cajones y rampa para andén.' },
+        itemOffered: { '@type': 'Product', name: 'Nave comercial de 260 m²', description: 'Nave comercial con recepción, sanitario, almacén, 3 cajones y rampa para andén.' },
       },
     },
     {

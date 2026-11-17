@@ -2,7 +2,7 @@ import './style.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import { NAVES, PRECIO_M2, ESQUEMA, CONTACTO, MODULOS, fmt } from './data.js';
+import { NAVES, PRECIO_M2, precioNave, ESQUEMA, CONTACTO, fmt } from './data.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -39,6 +39,8 @@ $('#year').textContent = new Date().getFullYear();
 /* ───────────── Image sequence ───────────── */
 const FRAMES = 153;
 const SEQ_SECONDS = 9;
+// juego HD en pantallas grandes, ligero en celulares
+const SEQ_DIR = Math.max(innerWidth, innerHeight) * Math.min(devicePixelRatio || 1, 2) > 1400 && innerWidth > 760 ? '/assets/recorrido-hd' : '/assets/recorrido-m';
 const frames = [];
 const canvas = $('#seqCanvas');
 const ctx = canvas.getContext('2d');
@@ -58,6 +60,7 @@ function drawFrame(i) {
   const cw = canvas.width, ch = canvas.height;
   const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
   const w = img.naturalWidth * s, h = img.naturalHeight * s;
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
 }
 
@@ -79,15 +82,15 @@ function preload() {
     };
     const hero = new Image();
     hero.onload = hero.onerror = tick;
-    hero.src = '/assets/img/hero-portada.webp';
+    hero.src = '/assets/img/acceso.webp';
     for (let i = 0; i < FRAMES; i++) {
       const img = new Image();
       if (i < CRITICAL) img.onload = img.onerror = () => { tick(); if (i === 0) drawFrame(seqState.frame); };
       frames.push(img);
     }
     // primero los cuadros críticos, luego el resto
-    frames.forEach((img, i) => { if (i < CRITICAL) img.src = `/assets/recorrido/f${String(i + 1).padStart(3, '0')}.webp`; });
-    const rest = () => frames.forEach((img, i) => { if (i >= CRITICAL) img.src = `/assets/recorrido/f${String(i + 1).padStart(3, '0')}.webp`; });
+    frames.forEach((img, i) => { if (i < CRITICAL) img.src = `${SEQ_DIR}/f${String(i + 1).padStart(3, '0')}.webp`; });
+    const rest = () => frames.forEach((img, i) => { if (i >= CRITICAL) img.src = `${SEQ_DIR}/f${String(i + 1).padStart(3, '0')}.webp`; });
     addEventListener('load', () => setTimeout(rest, 200), { once: true });
     setTimeout(resolve, 3500); // nunca bloquear más de 3.5 s
   });
@@ -225,20 +228,60 @@ mm.add('(min-width: 0px)', () => {
 });
 
 /* ───────────── Nave tipo ───────────── */
-gsap.set('.pin, .ubi__rings i', { xPercent: -50, yPercent: -50, scale: reduced ? 1 : 0 });
+/* Zonas de la planta: se iluminan al pasar por cada concepto */
+const specItems = $$('.specs li[data-zone]');
+let zoneDemo = null, userTouched = false;
+function showZone(z) {
+  $$('.zone').forEach((el) => el.classList.toggle('is-on', el.dataset.zone === z));
+  specItems.forEach((li) => li.classList.toggle('is-on', li.dataset.zone === z));
+}
+specItems.forEach((li) => {
+  const on = () => { userTouched = true; clearInterval(zoneDemo); showZone(li.dataset.zone); };
+  li.addEventListener('mouseenter', on);
+  li.addEventListener('focus', on);
+  li.addEventListener('click', on);
+  li.addEventListener('mouseleave', () => showZone(null));
+  li.addEventListener('blur', () => showZone(null));
+});
 gsap.timeline({ scrollTrigger: { trigger: '#nave', start: 'top 65%' } })
   .to('.nave__plan-frame', { clipPath: 'inset(0% 0 0 0 round 18px)', duration: 1.4, ease: 'expo.inOut' })
-  .to('.pin', { scale: 1, duration: 0.6, stagger: 0.12, ease: 'back.out(2)' }, '-=.3');
+  .add(() => {
+    // pequeño recorrido automático para mostrar la interacción
+    if (reduced || userTouched) return;
+    const order = ['almacen', 'recepcion', 'wc', 'anden', 'cajones'];
+    let i = 0;
+    zoneDemo = setInterval(() => {
+      if (i >= order.length) { clearInterval(zoneDemo); showZone(null); return; }
+      showZone(order[i++]);
+    }, 1100);
+  });
 
-/* ───────────── Integral ───────────── */
+/* ───────────── Integral: carrusel de amenidades ───────────── */
 gsap.timeline({ scrollTrigger: { trigger: '#integral', start: 'top 70%' } })
-  .to('.integral__img', { clipPath: 'inset(0 0% 0 0 round 24px)', duration: 1.5, ease: 'expo.inOut' })
-  .to('.integral__img img', { scale: 1, duration: 2, ease: 'expo.out' }, '-=1');
+  .to('.integral__img', { clipPath: 'inset(0 0% 0 0 round 24px)', duration: 1.5, ease: 'expo.inOut' });
+const slides = $$('#slides .slide'), dots = $$('#slides .slides__dots button');
+let slideIdx = 0, slideTimer = null;
+function goSlide(i) {
+  slideIdx = (i + slides.length) % slides.length;
+  slides.forEach((s, k) => s.classList.toggle('is-on', k === slideIdx));
+  dots.forEach((d, k) => d.classList.toggle('is-on', k === slideIdx));
+  $$('.amen li').forEach((li) => li.classList.toggle('is-on', +li.dataset.slide === slideIdx));
+}
+function autoSlides() { clearInterval(slideTimer); if (!reduced) slideTimer = setInterval(() => goSlide(slideIdx + 1), 4200); }
+dots.forEach((d, k) => d.addEventListener('click', () => { goSlide(k); autoSlides(); }));
+$$('.amen li').forEach((li) => {
+  const on = () => { goSlide(+li.dataset.slide); clearInterval(slideTimer); };
+  li.addEventListener('mouseenter', on); li.addEventListener('focus', on);
+  li.addEventListener('mouseleave', autoSlides); li.addEventListener('blur', autoSlides);
+});
+goSlide(0);
+ScrollTrigger.create({ trigger: '#integral', start: 'top 80%', end: 'bottom top', onToggle: (s) => (s.isActive ? autoSlides() : clearInterval(slideTimer)) });
 
 /* ───────────── Ubicación ───────────── */
 $$('.ubi .tab').forEach((t) => t.addEventListener('click', () => {
   $$('.ubi .tab').forEach((x) => { x.classList.toggle('is-active', x === t); x.setAttribute('aria-selected', String(x === t)); });
   $$('.ubi__img').forEach((img) => img.classList.toggle('is-on', img.dataset.map === t.dataset.map));
+  $('.ubi__logo').classList.toggle('is-off', t.dataset.map !== 'vial');
 }));
 gsap.from('.ubi__map', {
   clipPath: 'inset(12% 12% 12% 12% round 24px)', duration: 1.6, ease: 'expo.out',
@@ -369,7 +412,7 @@ gsap.timeline({ scrollTrigger: { trigger: '.mp__map', start: 'top 70%' } })
 
 // Tooltip
 const tip = $('#mpTip'), mapBox = $('.mp__map');
-const priceOf = (nv) => nv.m2 * PRECIO_M2;
+const priceOf = precioNave;
 function showTip(nv, evt) {
   const r = mapBox.getBoundingClientRect();
   let x, y;
@@ -460,7 +503,7 @@ $$('#cotMeses button').forEach((b) => b.addEventListener('click', () => {
   $$('#cotMeses button').forEach((x) => x.classList.remove('is-active'));
   b.classList.add('is-active'); meses = +b.dataset.m; calc();
 }));
-[selNave, engInput, $('#cotIva')].forEach((i) => i.addEventListener('input', calc));
+[selNave, engInput].forEach((i) => i.addEventListener('input', calc));
 selNave.addEventListener('change', () => { const n = +selNave.value; if (n !== selected) selectNave(n); });
 
 const shown = {};
@@ -477,16 +520,14 @@ function calc() {
   const nv = NAVES[+selNave.value - 1];
   const eng = +engInput.value / 100;
   engInput.style.setProperty('--p', ((+engInput.value - 30) / 70) * 100 + '%');
-  const iva = $('#cotIva').checked ? 1 + ESQUEMA.iva : 1;
-  const base = nv.m2 * PRECIO_M2;
-  const precio = base * iva;
+  const precio = precioNave(nv); // IVA incluido
+  const base = precio;
   const enganche = precio * eng;
   const saldo = precio - enganche;
   const contado = eng >= 1;
   $('#cotMeses').classList.toggle('is-disabled', contado);
   $('#cotEngLbl').textContent = contado ? 'Contado' : `${Math.round(eng * 100)} %`;
   $('#cotMesesLbl').textContent = contado ? '—' : `${meses} meses`;
-  $('#cotIvaTag').textContent = iva > 1 ? 'IVA incluido' : 'antes de IVA';
   $('#cotM2').textContent = nv.m2.toFixed(2);
   $('#cotPm2').textContent = fmt(PRECIO_M2);
   tweenText('#cotPrecio', precio);
@@ -497,9 +538,9 @@ function calc() {
   renderChart(base);
   const plan = amortizacion(enganche, saldo, contado ? 0 : meses);
   renderAmort(plan, contado);
-  lastCalc = { nv, base, precio, enganche, saldo, contado, iva: iva > 1, meses, plan };
+  lastCalc = { nv, base, precio, enganche, saldo, contado, meses, plan };
   $('#cotWa').href = waLink(
-    `Hola, coticé en el sitio de Viza Park:\n• Nave ${nv.n} (${nv.m2.toFixed(2)} m²)\n• Precio: ${fmt(precio)}${iva > 1 ? ' IVA incl.' : ' + IVA'}\n• Enganche: ${fmt(enganche)}\n` +
+    `Hola, coticé en el sitio de Viza Park:\n• Nave ${nv.n} (${nv.m2.toFixed(2)} m²)\n• Precio: ${fmt(precio)} IVA incluido\n• Enganche: ${fmt(enganche)}\n` +
     (contado ? '• Pago de contado\n' : `• ${meses} mensualidades de ${fmt(saldo / meses)}\n`) + 'Me gustaría recibir más información.'
   );
 }
@@ -612,11 +653,11 @@ footer{margin-top:18px;padding-top:10px;border-top:1px solid #e3e6ee;font-size:1
 .specs{font-size:11px;color:#55607a;margin:6px 0 0}.specs b{color:#0a1530}
 .am-wrap{page-break-before:always}
 </style></head><body>
-<header><img src="${location.origin}/assets/brand/logo-alt.png" alt="Viza Park"><div><b>Cotización ${folio}</b><br>${hoy}<br>Tel. ${CONTACTO.telefono}</div></header>
+<header><img src="${location.origin}/assets/brand/viza-park-logo.svg" alt="Viza Park"><div><b>Cotización ${folio}</b><br>${hoy}<br>Tel. ${CONTACTO.telefono}</div></header>
 <h1>Nave ${String(c.nv.n).padStart(2, '0')} · ${c.nv.m2.toFixed(2)} m²</h1>
 <div>Parque industrial Viza Park · ${CONTACTO.direccion}</div>
 <div class="grid">
- <div><h2>Resumen</h2><div class="box"><div>Precio de lista ${c.iva ? '(IVA incluido)' : '(antes de IVA)'}</div><div class="big">${money(c.precio)}</div><div>${c.nv.m2.toFixed(2)} m² × ${money(PRECIO_M2)} por m²</div></div>
+ <div><h2>Resumen</h2><div class="box"><div>Precio de lista (IVA incluido)</div><div class="big">${money(c.precio)}</div><div>${c.nv.m2.toFixed(2)} m² × ${money(PRECIO_M2)} por m²</div></div>
   <table class="sum">${row('Enganche', money(c.enganche))}${row('Saldo', money(c.saldo))}${c.contado ? row('Forma de pago', 'Contado') : row(`${c.meses} mensualidades sin intereses de`, money(c.saldo / c.meses), true)}${row('Renta mensual estimada (10 % anual)', money((c.base * ESQUEMA.retornoRenta) / 12))}</table></div>
  <div><h2>Proyección del activo</h2><table class="sum">${row('Valor hoy', money(c.base))}${vals.map((v, i) => row(`Año ${i + 1}`, money(v))).join('')}</table>
   <p style="color:#6b7590;font-size:10px">Plusvalía estimada de ${(ESQUEMA.plusvaliaAnual * 100).toFixed(2)} % anual.</p></div>
